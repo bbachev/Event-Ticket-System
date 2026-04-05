@@ -1,0 +1,103 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20260405-183500
+      author: bachev
+      changes:
+        - createTable:
+            tableName: booking_status
+            columns:
+              - column:
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk__booking_status__id
+                  name: id
+                  type: VARCHAR(32)
+        - insert:
+            tableName: booking_status
+            columns:
+              - column:
+                 name: id
+                 value: "CONFIRMED"
+        - insert:
+            tableName: booking_status
+            columns:
+              - column:
+                  name: id
+                  value: "CANCELLED"
+  - changeSet:
+      id: 20260405-184400
+      author: bachev
+      changes:
+        - createTable:
+            tableName: booking
+            columns:
+              - column:
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk__booking__id
+                    unique: true
+                  name: id
+                  type: UUID
+              - column:
+                  name: user_id
+                  type: UUID
+              - column:
+                  name: event_id
+                  type: UUID
+              - column:
+                  name: booked_tickets
+                  type: INT
+              - column:
+                  name: total_price
+                  type: BIGINT
+              - column:
+                  name: status
+                  type: VARCHAR(32)
+                  constraints:
+                    foreignKeyName: fk__booking_status__booking_status__id
+                    referencedColumnNames: id
+                    referencedTableName: booking_status
+              - column:
+                  name: created_at
+                  type: TIMESTAMPTZ
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+              - column:
+                  name: updated_at
+                  type: TIMESTAMPTZ
+  - changeSet:
+      id: 20260405-184800
+      author: bachev
+      changes:
+        - createIndex:
+            tableName: booking
+            indexName: idx__booking__user_id
+            columns:
+              - column:
+                  name: user_id
+  - changeSet:
+      id: 20260405-1855700
+      author: bachev
+      changes:
+        - createTable:
+            tableName: ticket_inventory
+            columns:
+              - column:
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk__ticket_inventory__id
+                    unique: true
+                  name: id
+                  type: UUID
+              - column:
+                  name: total_tickets
+                  type: INT
+              - column:
+                  name: available_tickets
+                  type: INT
+              - column:
+                  name: created_at
+                  type: TIMESTAMPTZ
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+              - column:
+                  name: updated_at
+                  type: TIMESTAMPTZ
