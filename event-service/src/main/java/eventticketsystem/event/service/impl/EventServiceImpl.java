@@ -85,4 +85,11 @@ public class EventServiceImpl implements EventService {
                 )
         );
     }
+
+    @Override
+    public void deleteEvent(UUID id) {
+        EventEntity entity = this.eventRepository.findById(id)
+                .orElseThrow(() -> new EventNotExistsException(String.valueOf(id)));
+        this.eventRepository.delete(entity);
+    }
 }

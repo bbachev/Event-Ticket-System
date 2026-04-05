@@ -52,7 +52,13 @@ public class EventControllerImpl {
        }
     }
 
-    public ResponseEntity<Void> deleteEvent(@PathVariable String id) {
-        return null;
+    @DeleteMapping("events/{id}")
+    public ResponseEntity<Void> deleteEvent(@PathVariable UUID id) {
+        try {
+            this.eventService.deleteEvent(id);
+            return ResponseEntity.noContent().build();
+        } catch (EventNotExistsException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

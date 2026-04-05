@@ -13,4 +13,5 @@ public interface EventService {
     EventResponse updateEvent(UUID id, EventRequest request);
     Page<EventResponse> getAllEvents(EventFilterRequest filter);
     Optional<EventResponse> getEvent(UUID id);
+    void deleteEvent(UUID id);
 }
