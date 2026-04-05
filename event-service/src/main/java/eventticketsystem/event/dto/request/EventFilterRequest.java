@@ -47,4 +47,23 @@ public record EventFilterRequest(
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
+    public String toCacheKey() {
+        return "events:" +
+                keyPart(category) + ":" +
+                keyPart(location) + ":" +
+                keyPart(dateFrom) + ":" +
+                keyPart(dateTo) + ":" +
+                keyPart(priceFrom) + ":" +
+                keyPart(priceTo) + ":" +
+                keyPart(sortBy) + ":" +
+                keyPart(sortDir) + ":" +
+                keyPart(page) + ":" +
+                keyPart(size);
+    }
+
+    private String keyPart(Object value) {
+        if (value == null) return "";
+        String str = value.toString().trim().toLowerCase();
+        return str.equals("null") ? "" : str;
+    }
 }

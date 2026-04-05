@@ -3,6 +3,7 @@ package eventticketsystem.event.controller;
 import eventticketsystem.event.dto.request.EventFilterRequest;
 import eventticketsystem.event.dto.request.EventRequest;
 import eventticketsystem.event.dto.response.EventResponse;
+import eventticketsystem.event.dto.response.PageDto;
 import eventticketsystem.event.exception.EventAlreadyExistsException;
 import eventticketsystem.event.exception.EventNotExistsException;
 import eventticketsystem.event.service.EventService;
@@ -32,7 +33,7 @@ public class EventControllerImpl {
     }
 
     @GetMapping("events")
-    public ResponseEntity<Page<EventResponse>> getAllEvents(@ModelAttribute EventFilterRequest filter) {
+    public ResponseEntity<PageDto<EventResponse>> getAllEvents(@ModelAttribute EventFilterRequest filter) {
         return ResponseEntity.ok(this.eventService.getAllEvents(filter));
     }
 

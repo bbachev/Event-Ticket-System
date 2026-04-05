@@ -2,6 +2,7 @@ package eventticketsystem.event.service.impl;
 
 import eventticketsystem.event.dto.request.EventFilterRequest;
 import eventticketsystem.event.dto.request.EventRequest;
+import eventticketsystem.event.dto.response.PageDto;
 import eventticketsystem.event.entity.EventEntity;
 import eventticketsystem.event.dto.response.EventResponse;
 import eventticketsystem.event.exception.EventAlreadyExistsException;
@@ -10,6 +11,8 @@ import eventticketsystem.event.mapper.EventMapper;
 import eventticketsystem.event.repository.EventRepository;
 import eventticketsystem.event.service.EventService;
 import org.mapstruct.factory.Mappers;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,6 +34,7 @@ public class EventServiceImpl implements EventService {
         this.eventRepository = eventRepository;
     }
 
+    @CacheEvict(value = "events", allEntries = true)
     @Override
     public EventResponse createEvent(EventRequest request) {
         EventEntity eventEntity = MAPPER.toEntity(request);
@@ -41,6 +45,7 @@ public class EventServiceImpl implements EventService {
         }
     }
 
+    @CacheEvict(value = "events", allEntries = true)
     @Override
     public EventResponse updateEvent(UUID id, EventRequest request) {
         EventEntity eventEntity = this.eventRepository.findById(id)
@@ -59,8 +64,9 @@ public class EventServiceImpl implements EventService {
         return MAPPER.toModel(eventRepository.save(eventEntity));
     }
 
+    @Cacheable(value = "events", key = "#filter.toCacheKey()")
     @Override
-    public Page<EventResponse> getAllEvents(EventFilterRequest filter) {
+    public PageDto<EventResponse> getAllEvents(EventFilterRequest filter) {
         int from = filter.page() == null ? 0 : filter.page();
         int pageSize = filter.size() == null ? 30 : filter.size();
         Specification<EventEntity> spec = filter.toSpecification();
@@ -74,7 +80,14 @@ public class EventServiceImpl implements EventService {
         }
 
         PageRequest pageRequest = PageRequest.of(from, pageSize, sort);
-        return this.eventRepository.findAll(spec, pageRequest).map(MAPPER::toModel);
+        Page<EventResponse> response = this.eventRepository.findAll(spec, pageRequest).map(MAPPER::toModel);
+
+        return new PageDto<>(
+                response.getContent(),
+                response.getNumber(),
+                response.getSize(),
+                response.getTotalElements()
+        );
     }
 
     @Override
@@ -86,6 +99,7 @@ public class EventServiceImpl implements EventService {
         );
     }
 
+    @CacheEvict(value = "events", allEntries = true)
     @Override
     public void deleteEvent(UUID id) {
         EventEntity entity = this.eventRepository.findById(id)
