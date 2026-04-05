@@ -1,18 +1,18 @@
 package eventticketsystem.event.controller;
 
-import eventticketsystem.event.dto.request.CreateEventRequest;
-import eventticketsystem.event.dto.request.UpdateEventRequest;
+import eventticketsystem.event.dto.request.EventFilterRequest;
+import eventticketsystem.event.dto.request.EventRequest;
 import eventticketsystem.event.dto.response.EventResponse;
 import eventticketsystem.event.exception.EventAlreadyExistsException;
+import eventticketsystem.event.exception.EventNotExistsException;
 import eventticketsystem.event.service.EventService;
+import jakarta.annotation.Nullable;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class EventControllerImpl {
@@ -23,7 +23,7 @@ public class EventControllerImpl {
     }
 
     @PostMapping("/events")
-    public ResponseEntity<EventResponse> createEvent(@RequestBody CreateEventRequest request) {
+    public ResponseEntity<EventResponse> createEvent(@RequestBody EventRequest request) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(eventService.createEvent(request));
         } catch (EventAlreadyExistsException e) {
@@ -31,16 +31,25 @@ public class EventControllerImpl {
         }
     }
 
-    public ResponseEntity<List<EventResponse>> getAllEvents() {
-        return null;
+    @GetMapping("events")
+    public ResponseEntity<Page<EventResponse>> getAllEvents(@ModelAttribute EventFilterRequest filter) {
+        return ResponseEntity.ok(this.eventService.getAllEvents(filter));
     }
 
-    public ResponseEntity<EventResponse> getEventById(@PathVariable String id) {
-        return null;
+    @GetMapping("events/{id}")
+    public ResponseEntity<EventResponse> getEventById(@PathVariable UUID id) {
+       return eventService.getEvent(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    public ResponseEntity<EventResponse> updateEvent(@PathVariable String id, @RequestBody UpdateEventRequest request) {
-        return null;
+    @PutMapping("events/{id}")
+    public ResponseEntity<EventResponse> updateEvent(@PathVariable UUID id, @RequestBody EventRequest request) {
+       try {
+           return ResponseEntity.ok(this.eventService.updateEvent(id, request));
+       } catch (EventNotExistsException e){
+           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+       }
     }
 
     public ResponseEntity<Void> deleteEvent(@PathVariable String id) {

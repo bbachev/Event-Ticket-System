@@ -5,7 +5,6 @@ import eventticketsystem.event.dto.EventStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -58,6 +57,5 @@ public class EventEntity {
     private OffsetDateTime createdAt;
 
     @Column(name = "updated_at")
-    @UpdateTimestamp
     private OffsetDateTime updatedAt;
 }
