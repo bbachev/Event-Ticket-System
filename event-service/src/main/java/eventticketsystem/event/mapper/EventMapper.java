@@ -1,5 +1,6 @@
 package eventticketsystem.event.mapper;
 
+import eventticketsystem.event.dto.messaging.EventCreatedMessage;
 import eventticketsystem.event.dto.request.EventRequest;
 import eventticketsystem.event.entity.EventEntity;
 import eventticketsystem.event.dto.response.EventResponse;
@@ -14,4 +15,6 @@ public interface EventMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "status",  expression = "java(eventticketsystem.event.dto.EventStatus.ACTIVE)")
     EventEntity toEntity(EventRequest request);
+
+    EventCreatedMessage toMessageDto(EventEntity eventEntity);
 }

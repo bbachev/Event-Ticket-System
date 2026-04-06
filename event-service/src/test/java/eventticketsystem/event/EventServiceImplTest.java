@@ -1,11 +1,13 @@
 package eventticketsystem.event;
 
 import eventticketsystem.event.dto.EventStatus;
+import eventticketsystem.event.dto.messaging.EventCreatedMessage;
 import eventticketsystem.event.dto.request.EventRequest;
 import eventticketsystem.event.dto.response.EventResponse;
 import eventticketsystem.event.entity.EventEntity;
 import eventticketsystem.event.exception.EventAlreadyExistsException;
 import eventticketsystem.event.exception.EventNotExistsException;
+import eventticketsystem.event.messaging.EventKafkaProducer;
 import eventticketsystem.event.repository.EventRepository;
 import eventticketsystem.event.service.impl.EventServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.OffsetDateTime;
 import java.util.Optional;
@@ -24,6 +27,9 @@ import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceImplTest {
+
+    @Mock
+    private EventKafkaProducer kafkaProducer;
 
     @Mock
     private EventRepository repository;
@@ -158,5 +164,17 @@ class EventServiceImplTest {
 
         Mockito.when(this.repository.findById(id)).thenReturn(Optional.empty());
         assertThrowsExactly(EventNotExistsException.class, () -> this.service.deleteEvent(id));
+    }
+
+
+    @Test
+    public void createEventShouldSendKafkaMessage() {
+        EventRequest eventRequestService = new EventRequest("Test",
+                null, null, "Sofia", OffsetDateTime.now(),
+                20000L, 200, EventStatus.ACTIVE);
+
+        this.service.createEvent(eventRequestService);
+
+        Mockito.verify(kafkaProducer).send(any(), any());
     }
 }

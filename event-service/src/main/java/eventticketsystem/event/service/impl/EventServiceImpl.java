@@ -1,5 +1,6 @@
 package eventticketsystem.event.service.impl;
 
+import eventticketsystem.event.dto.messaging.EventUpdateMessage;
 import eventticketsystem.event.dto.request.EventFilterRequest;
 import eventticketsystem.event.dto.request.EventRequest;
 import eventticketsystem.event.dto.response.PageDto;
@@ -8,9 +9,11 @@ import eventticketsystem.event.dto.response.EventResponse;
 import eventticketsystem.event.exception.EventAlreadyExistsException;
 import eventticketsystem.event.exception.EventNotExistsException;
 import eventticketsystem.event.mapper.EventMapper;
+import eventticketsystem.event.messaging.EventKafkaProducer;
 import eventticketsystem.event.repository.EventRepository;
 import eventticketsystem.event.service.EventService;
 import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -27,10 +30,15 @@ import java.util.UUID;
 @Service
 public class EventServiceImpl implements EventService {
     private static final EventMapper MAPPER = Mappers.getMapper(EventMapper.class);
+    private final EventKafkaProducer kafkaProducer;
 
     private final EventRepository eventRepository;
 
-    public EventServiceImpl(EventRepository eventRepository) {
+    @Value("${kafka.topics.event-created}")
+    private String eventCreatedTopic;
+
+    public EventServiceImpl(EventKafkaProducer kafkaProducer, EventRepository eventRepository) {
+        this.kafkaProducer = kafkaProducer;
         this.eventRepository = eventRepository;
     }
 
@@ -39,7 +47,10 @@ public class EventServiceImpl implements EventService {
     public EventResponse createEvent(EventRequest request) {
         EventEntity eventEntity = MAPPER.toEntity(request);
         try {
-            return MAPPER.toModel(this.eventRepository.save(eventEntity));
+            EventEntity saved = this.eventRepository.save(eventEntity);
+
+            this.kafkaProducer.send(eventCreatedTopic, MAPPER.toMessageDto(saved));
+            return MAPPER.toModel(saved);
         } catch (DataIntegrityViolationException e) {
             throw new EventAlreadyExistsException(request.name(), request.eventDate());
         }
@@ -105,5 +116,18 @@ public class EventServiceImpl implements EventService {
         EventEntity entity = this.eventRepository.findById(id)
                 .orElseThrow(() -> new EventNotExistsException(String.valueOf(id)));
         this.eventRepository.delete(entity);
+    }
+
+    @CacheEvict(value = "events", allEntries = true)
+    @Override
+    public void updateEventStatus(EventUpdateMessage message) {
+        EventEntity eventEntity = this.eventRepository.findById(message.eventId())
+                .orElseThrow(() -> new EventNotExistsException(String.valueOf(message.eventId())));
+
+        eventEntity.setStatus(message.status());
+        eventEntity.setUpdatedAt(OffsetDateTime.now());
+
+        this.eventRepository.save(eventEntity);
+
     }
 }

@@ -1,5 +1,6 @@
 package eventticketsystem.event.service;
 
+import eventticketsystem.event.dto.messaging.EventUpdateMessage;
 import eventticketsystem.event.dto.request.EventFilterRequest;
 import eventticketsystem.event.dto.request.EventRequest;
 import eventticketsystem.event.dto.response.EventResponse;
@@ -14,4 +15,5 @@ public interface EventService {
     PageDto<EventResponse> getAllEvents(EventFilterRequest filter);
     Optional<EventResponse> getEvent(UUID id);
     void deleteEvent(UUID id);
+    void updateEventStatus(EventUpdateMessage message);
 }
