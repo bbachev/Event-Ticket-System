@@ -16,13 +16,17 @@ public class TicketInventoryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @Column(name = "id")
+    private UUID eventId;
 
     @Column(name = "total_tickets")
     private Integer totalTickets;
 
     @Column(name = "available_tickets")
     private Integer availableTickets;
+
+    @Column(name = "ticket_price")
+    private Long ticketPrice;
 
     @Column(name = "created_at")
     @CreationTimestamp

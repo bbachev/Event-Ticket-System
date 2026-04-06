@@ -95,6 +95,9 @@ databaseChangeLog:
                   name: available_tickets
                   type: INT
               - column:
+                  name: ticket_price
+                  type: BIGINT
+              - column:
                   name: created_at
                   type: TIMESTAMPTZ
                   defaultValueComputed: "CURRENT_TIMESTAMP"
