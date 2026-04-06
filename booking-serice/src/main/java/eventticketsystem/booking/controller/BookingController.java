@@ -22,13 +22,13 @@ public class BookingController {
     }
 
     @PostMapping("/bookings")
-    public ResponseEntity<Booking> createBooking(@RequestBody BookingRequest request){
+    public ResponseEntity<?> createBooking(@RequestBody BookingRequest request){
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.createBooking(request));
         } catch (TicketInventoryNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (TicketsNotAvailableException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
     }
 

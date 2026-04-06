@@ -15,7 +15,6 @@ import java.util.UUID;
 public class TicketInventoryEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
     private UUID eventId;
 

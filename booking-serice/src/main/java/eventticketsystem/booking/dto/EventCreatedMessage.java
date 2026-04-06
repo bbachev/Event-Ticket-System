@@ -1,4 +1,4 @@
-package eventticketsystem.event.dto.messaging;
+package eventticketsystem.booking.dto;
 
 import java.util.UUID;
 

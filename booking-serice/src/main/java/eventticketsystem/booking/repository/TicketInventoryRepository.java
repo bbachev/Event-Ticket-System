@@ -11,5 +11,5 @@ import java.util.UUID;
 public interface TicketInventoryRepository extends JpaRepository<TicketInventoryEntity, UUID> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<TicketInventoryEntity> findByEventId(UUID eventId);
+    Optional<TicketInventoryEntity> findById(UUID eventId);
 }

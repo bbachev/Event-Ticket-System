@@ -9,9 +9,9 @@ import eventticketsystem.event.dto.response.EventResponse;
 import eventticketsystem.event.exception.EventAlreadyExistsException;
 import eventticketsystem.event.exception.EventNotExistsException;
 import eventticketsystem.event.mapper.EventMapper;
-import eventticketsystem.event.messaging.EventKafkaProducer;
 import eventticketsystem.event.repository.EventRepository;
 import eventticketsystem.event.service.EventService;
+import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
@@ -21,24 +21,27 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class EventServiceImpl implements EventService {
     private static final EventMapper MAPPER = Mappers.getMapper(EventMapper.class);
-    private final EventKafkaProducer kafkaProducer;
+
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     private final EventRepository eventRepository;
 
-    @Value("${kafka.topics.event-created}")
+    @Value("${spring.kafka.producer.topics.event-created}")
     private String eventCreatedTopic;
 
-    public EventServiceImpl(EventKafkaProducer kafkaProducer, EventRepository eventRepository) {
-        this.kafkaProducer = kafkaProducer;
+    public EventServiceImpl(KafkaTemplate<String, Object> kafkaTemplate, EventRepository eventRepository) {
+        this.kafkaTemplate = kafkaTemplate;
         this.eventRepository = eventRepository;
     }
 
@@ -48,8 +51,8 @@ public class EventServiceImpl implements EventService {
         EventEntity eventEntity = MAPPER.toEntity(request);
         try {
             EventEntity saved = this.eventRepository.save(eventEntity);
+            this.kafkaTemplate.send(eventCreatedTopic, MAPPER.toMessageDto(saved));
 
-            this.kafkaProducer.send(eventCreatedTopic, MAPPER.toMessageDto(saved));
             return MAPPER.toModel(saved);
         } catch (DataIntegrityViolationException e) {
             throw new EventAlreadyExistsException(request.name(), request.eventDate());

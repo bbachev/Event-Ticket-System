@@ -65,7 +65,7 @@ class BookingServiceApplicationTests {
         ticketInventoryEntity.setTicketPrice(200L);
         ticketInventoryEntity.setTotalTickets(200);
 
-        Mockito.when(this.ticketInventoryRepository.findByEventId(eventId)).thenReturn(Optional.of(ticketInventoryEntity));
+        Mockito.when(this.ticketInventoryRepository.findById(eventId)).thenReturn(Optional.of(ticketInventoryEntity));
 
 
         BookingEntity bookingEntity = new BookingEntity();
@@ -85,7 +85,7 @@ class BookingServiceApplicationTests {
 
     @Test
     public void testCreateBookingShouldThrowWhenInventoryNotFound(){
-        Mockito.when(this.ticketInventoryRepository.findByEventId(eventId))
+        Mockito.when(this.ticketInventoryRepository.findById(eventId))
                 .thenThrow(TicketInventoryNotFoundException.class);
 
         assertThrowsExactly(TicketInventoryNotFoundException.class,
@@ -100,7 +100,7 @@ class BookingServiceApplicationTests {
         ticketInventoryEntity.setTicketPrice(200L);
         ticketInventoryEntity.setTotalTickets(200);
 
-        Mockito.when(this.ticketInventoryRepository.findByEventId(eventId)).thenReturn(Optional.of(ticketInventoryEntity));
+        Mockito.when(this.ticketInventoryRepository.findById(eventId)).thenReturn(Optional.of(ticketInventoryEntity));
 
         assertThrowsExactly(TicketsNotAvailableException.class, () -> this.bookingService.createBooking(bookingRequest));
 
@@ -130,7 +130,7 @@ class BookingServiceApplicationTests {
 
         Mockito.when(this.bookingRepository.findById(bookingId)).thenReturn(Optional.of(bookingEntity));
         Mockito.when(this.bookingRepository.save(any(BookingEntity.class))).thenReturn(cancelledEntity);
-        Mockito.when(this.ticketInventoryRepository.findByEventId(eventId)).thenReturn(Optional.of(ticketInventoryEntity));
+        Mockito.when(this.ticketInventoryRepository.findById(eventId)).thenReturn(Optional.of(ticketInventoryEntity));
         Mockito.when(this.ticketInventoryRepository.save(any(TicketInventoryEntity.class))).thenReturn(ticketInventoryEntity);
 
         this.bookingService.softDeleteBooking(bookingId);
@@ -166,8 +166,8 @@ class BookingServiceApplicationTests {
 
         Page<BookingEntity> page = new PageImpl<>(List.of(bookingEntity, bookingEntity2));
 
-        Mockito.when(this.bookingRepository.findAllByUserIdAndStatus(
-                eq(userId), eq(BookingStatus.CONFIRMED), any(Pageable.class)
+        Mockito.when(this.bookingRepository.findAllByUserId(
+                eq(userId), any(Pageable.class)
         )).thenReturn(page);
 
         PageDto<Booking> allBookingsForUser = this.bookingService.getAllBookingsForUser(userId, 0, 30);

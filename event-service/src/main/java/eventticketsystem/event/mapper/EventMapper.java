@@ -16,5 +16,7 @@ public interface EventMapper {
     @Mapping(target = "status",  expression = "java(eventticketsystem.event.dto.EventStatus.ACTIVE)")
     EventEntity toEntity(EventRequest request);
 
+    @Mapping(target = "eventId", source = "id")
+    @Mapping(target = "ticketPrice", source = "price")
     EventCreatedMessage toMessageDto(EventEntity eventEntity);
 }

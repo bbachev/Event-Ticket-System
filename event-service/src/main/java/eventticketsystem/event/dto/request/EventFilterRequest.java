@@ -1,5 +1,6 @@
 package eventticketsystem.event.dto.request;
 
+import eventticketsystem.event.dto.EventStatus;
 import eventticketsystem.event.entity.EventEntity;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
@@ -15,6 +16,7 @@ public record EventFilterRequest(
         LocalDate dateTo,
         Long priceFrom,
         Long priceTo,
+        EventStatus status,
         String sortBy,
         String sortDir,
         Integer page,
@@ -43,6 +45,9 @@ public record EventFilterRequest(
             if (priceTo != null) {
                 predicates.add(cb.lessThanOrEqualTo(root.get("price"), priceTo));
             }
+            if (status != null) {
+                predicates.add(cb.equal(root.get("status"), status));
+            }
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
@@ -57,6 +62,7 @@ public record EventFilterRequest(
                 keyPart(priceTo) + ":" +
                 keyPart(sortBy) + ":" +
                 keyPart(sortDir) + ":" +
+                keyPart(status) + ":" +
                 keyPart(page) + ":" +
                 keyPart(size);
     }

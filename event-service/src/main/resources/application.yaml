@@ -21,6 +21,7 @@ spring:
       retries: 3
       properties:
         retry.backoff.ms: 1000
+        spring.json.add.type.headers: false
       topics:
         event-created: event-created
     consumer:
@@ -29,6 +30,7 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
+        spring.json.value.default.type: eventticketsystem.event.dto.messaging.EventUpdateMessage
 logging:
   level:
     liquibase: INFO

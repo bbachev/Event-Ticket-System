@@ -1,4 +1,4 @@
-package eventticketsystem.event.messaging;
+package eventticketsystem.booking.messaging;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class EventKafkaProducer {
+public class BookingKafkaProducer {
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public EventKafkaProducer(KafkaTemplate<String, Object> kafkaTemplate) {
+    public BookingKafkaProducer(KafkaTemplate<String, Object> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 

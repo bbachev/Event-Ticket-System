@@ -1,7 +1,6 @@
 package eventticketsystem.event;
 
 import eventticketsystem.event.dto.EventStatus;
-import eventticketsystem.event.dto.messaging.EventCreatedMessage;
 import eventticketsystem.event.dto.request.EventRequest;
 import eventticketsystem.event.dto.response.EventResponse;
 import eventticketsystem.event.entity.EventEntity;
@@ -29,7 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 class EventServiceImplTest {
 
     @Mock
-    private EventKafkaProducer kafkaProducer;
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     @Mock
     private EventRepository repository;
@@ -175,6 +174,6 @@ class EventServiceImplTest {
 
         this.service.createEvent(eventRequestService);
 
-        Mockito.verify(kafkaProducer).send(any(), any());
+        Mockito.verify(kafkaTemplate).send(any(), any());
     }
 }
