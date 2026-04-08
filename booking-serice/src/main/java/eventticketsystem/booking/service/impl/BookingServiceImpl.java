@@ -29,6 +29,9 @@ public class BookingServiceImpl implements BookingService {
     @Value("${spring.kafka.producer.topics.event-updated}")
     private String eventUpdateTopic;
 
+    @Value("${spring.kafka.producer.topics.booking-created}")
+    private String bookingCreatedTopic;
+
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final BookingRepository bookingRepository;
     private final TicketInventoryRepository ticketInventoryRepository;
@@ -69,6 +72,8 @@ public class BookingServiceImpl implements BookingService {
                     EventStatus.SOLD_OUT)
             );
         }
+
+        this.kafkaTemplate.send(bookingCreatedTopic, MAPPER.toMessage(model));
         return model;
     }
 

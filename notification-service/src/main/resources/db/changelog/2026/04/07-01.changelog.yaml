@@ -1,0 +1,116 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20260407-094200
+      author: bachev
+      changes:
+        - createTable:
+            tableName: message_template
+            columns:
+              - column:
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk__message_template__id
+                  name: id
+                  type: VARCHAR(64)
+              - column:
+                  name: channel
+                  type: VARCHAR(32)
+              - column:
+                  name: description
+                  type: VARCHAR(32)
+              - column:
+                  name: subject
+                  type: VARCHAR(255)
+              - column:
+                  name: body_html
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMPTZ
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+              - column:
+                  name: updated_at
+                  type: TIMESTAMPTZ
+  - changeSet:
+      id: 20260407-094700
+      author: bachev
+      changes:
+        - insert:
+            tableName: message_template
+            columns:
+              - column:
+                  name: id
+                  value: "NEW_EVENT"
+              - column:
+                  name: channel
+                  value: "EMAIL"
+              - column:
+                  name: description
+                  value: "Template for new event"
+              - column:
+                  name: subject
+                  value: "New Event Available"
+              - column:
+                  name: body_html
+                  valueClobFile: /templates/event-created.html
+              - column:
+                  name: created_at
+                  valueComputed: now()
+  - changeSet:
+      id: 20260407-173200
+      author: bachev
+      changes:
+        - createTable:
+            tableName: message
+            columns:
+              - column:
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk__message__id
+                  name: id
+                  type: UUID
+              - column:
+                  name: template_id
+                  type: VARCHAR(64)
+                  constraints:
+                    foreignKeyName: fk__message__id__message_template_id
+                    referencedColumnNames: id
+                    referencedTableName: message_template
+              - column:
+                  name: sender
+                  type: VARCHAR(128)
+              - column:
+                  name: receiver
+                  type: VARCHAR(128)
+              - column:
+                  name: subject
+                  type: VARCHAR(128)
+              - column:
+                  name: created_at
+                  type: TIMESTAMPTZ
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+  - changeSet:
+      id: 20260408-080600
+      author: bachev
+      changes:
+        - insert:
+            tableName: message_template
+            columns:
+              - column:
+                  name: id
+                  value: "BOOKING_CREATED"
+              - column:
+                  name: channel
+                  value: "EMAIL"
+              - column:
+                  name: description
+                  value: "Template for successful booking"
+              - column:
+                  name: subject
+                  value: Booking Confirmed
+              - column:
+                  name: body_html
+                  valueClobFile: /templates/booking-created.html
+              - column:
+                  name: created_at
+                  valueComputed: now()

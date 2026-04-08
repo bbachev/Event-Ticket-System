@@ -1,5 +1,6 @@
 package eventticketsystem.event.service.impl;
 
+import eventticketsystem.event.dto.messaging.EventCreatedMessage;
 import eventticketsystem.event.dto.messaging.EventUpdateMessage;
 import eventticketsystem.event.dto.request.EventFilterRequest;
 import eventticketsystem.event.dto.request.EventRequest;
@@ -48,15 +49,16 @@ public class EventServiceImpl implements EventService {
     @CacheEvict(value = "events", allEntries = true)
     @Override
     public EventResponse createEvent(EventRequest request) {
-        EventEntity eventEntity = MAPPER.toEntity(request);
+        EventEntity saved = this.eventRepository.save(MAPPER.toEntity(request));
         try {
-            EventEntity saved = this.eventRepository.save(eventEntity);
+
             this.kafkaTemplate.send(eventCreatedTopic, MAPPER.toMessageDto(saved));
 
-            return MAPPER.toModel(saved);
+
         } catch (DataIntegrityViolationException e) {
             throw new EventAlreadyExistsException(request.name(), request.eventDate());
         }
+        return MAPPER.toModel(saved);
     }
 
     @CacheEvict(value = "events", allEntries = true)

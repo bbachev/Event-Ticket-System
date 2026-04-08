@@ -22,7 +22,7 @@ public class BookingKafkaConsumer {
             log.info("Received message in topic: {} message: {}", "event-created", message);
             this.bookingService.addToTicketInventory(message);
         } catch (TicketInventoryAlreadyExistsException e){
-            log.error(String.valueOf(e));
+            log.error(e.getMessage());
         }
     }
 }

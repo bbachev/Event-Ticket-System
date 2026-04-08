@@ -1,34 +1,44 @@
 spring:
   application:
-    name: booking-service
+    name: notification-service
+
   profiles:
     active: local
+
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
+
   jpa:
     hibernate:
       ddl-auto: validate
     show-sql: true
+
+  mail:
+    host: sandbox.smtp.mailtrap.io
+    port: 587
+    username: 5f6dc5ffdbd4b5
+    password: 433a9d5cfdb742
+    default-sender: no-reply@event-ticket-system
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+
   kafka:
     bootstrap-servers: localhost:9092
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      retries: 3
-      properties:
-        retry.backoff.ms: 1000
-        spring.json.add.type.headers: false
-      topics:
-        event-updated: event-updated
-        booking-created: booking-created
     consumer:
-      group-id: booking-service
+      group-id: notification-service
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
-        spring.json.value.default.type: eventticketsystem.booking.dto.EventCreatedMessage
+        spring.json.value.default.type: eventticketsystem.notification.dto.EventCreatedMessage
 logging:
   level:
     liquibase: INFO

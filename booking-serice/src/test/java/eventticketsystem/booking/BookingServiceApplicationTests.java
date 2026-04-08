@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +34,10 @@ import static org.mockito.ArgumentMatchers.eq;
 
 @ExtendWith(MockitoExtension.class)
 class BookingServiceApplicationTests {
+
+    @Mock
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
     @Mock
     private BookingRepository bookingRepository;
 

@@ -18,5 +18,6 @@ public interface EventMapper {
 
     @Mapping(target = "eventId", source = "id")
     @Mapping(target = "ticketPrice", source = "price")
+    @Mapping(target = "messageId", expression = ("java(UUID.randomUUID())"))
     EventCreatedMessage toMessageDto(EventEntity eventEntity);
 }
