@@ -7,8 +7,8 @@ import java.util.UUID;
 
 public record EventCreatedMessage(
         UUID messageId,
-        UUID eventId
-        , Integer totalTickets,
+        UUID eventId,
+        Integer totalTickets,
         String category,
         Long ticketPrice,
         String name,

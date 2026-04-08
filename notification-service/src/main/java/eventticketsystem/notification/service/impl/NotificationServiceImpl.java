@@ -1,6 +1,6 @@
 package eventticketsystem.notification.service.impl;
 
-import eventticketsystem.exception.TemplateNotExistsException;
+import eventticketsystem.notification.exception.TemplateNotExistsException;
 import eventticketsystem.notification.dto.MessageTemplate;
 import eventticketsystem.notification.dto.NotificationMessage;
 import eventticketsystem.notification.entity.MessageEntity;

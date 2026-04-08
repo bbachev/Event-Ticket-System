@@ -1,4 +1,4 @@
-package eventticketsystem.exception;
+package eventticketsystem.notification.exception;
 
 public class TemplateNotExistsException extends RuntimeException {
     public TemplateNotExistsException(String type) {
