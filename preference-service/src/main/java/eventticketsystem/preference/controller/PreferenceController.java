@@ -2,6 +2,7 @@ package eventticketsystem.preference.controller;
 
 import eventticketsystem.preference.dto.PreferenceCategory;
 import eventticketsystem.preference.dto.PreferenceRequest;
+import eventticketsystem.preference.dto.User;
 import eventticketsystem.preference.dto.UserDetailsRequest;
 import eventticketsystem.preference.exception.UserNotExistsException;
 import eventticketsystem.preference.service.PreferenceService;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -20,9 +22,8 @@ public class PreferenceController {
     }
 
     @GetMapping("/preferences")
-    public ResponseEntity<?> searchByCategory(@RequestParam PreferenceCategory category){
-        this.preferenceService.searchByPreference(category);
-        return null;
+    public ResponseEntity<List<User>> searchByCategory(@RequestParam PreferenceCategory category){
+        return ResponseEntity.ok(this.preferenceService.searchByPreference(category));
     }
 
     @GetMapping("/preferences/{userId}")
