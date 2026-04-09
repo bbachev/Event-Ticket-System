@@ -1,0 +1,122 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20260408-093500
+      author: bachev
+      changes:
+        - createTable:
+            tableName: preferences
+            columns:
+              - column:
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk__preferences__id
+                  name: id
+                  type: VARCHAR(64)
+        - insert:
+            tableName: preferences
+            columns:
+              - column:
+                  name: id
+                  value: MUSIC
+        - insert:
+            tableName: preferences
+            columns:
+              - column:
+                  name: id
+                  value: SPORTS
+        - insert:
+            tableName: preferences
+            columns:
+              - column:
+                  name: id
+                  value: THEATRE
+        - insert:
+            tableName: preferences
+            columns:
+              - column:
+                  name: id
+                  value: CONFERENCE
+        - insert:
+            tableName: preferences
+            columns:
+              - column:
+                  name: id
+                  value: COMEDY
+        - insert:
+            tableName: preferences
+            columns:
+              - column:
+                  name: id
+                  value: ARTS
+        - insert:
+            tableName: preferences
+            columns:
+              - column:
+                  name: id
+                  value: FOOD
+        - insert:
+            tableName: preferences
+            columns:
+              - column:
+                  name: id
+                  value: OUTDOOR
+  - changeSet:
+      id: 20260408-094200
+      author: bachev
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk__user__id
+                  name: id
+                  type: UUID
+              - column:
+                  name: first_name
+                  type: VARCHAR(64)
+              - column:
+                  name: last_name
+                  type: VARCHAR(64)
+              - column:
+                  name: email
+                  type: VARCHAR(64)
+              - column:
+                  name: created_at
+                  type: TIMESTAMPTZ
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+              - column:
+                  name: updated_at
+                  type: TIMESTAMPTZ
+  - changeSet:
+      id: 20260408-094500
+      author: bachev
+      changes:
+        - createTable:
+            tableName: user_preference
+            columns:
+              - column:
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk__user_preference__id
+                  name: id
+                  type: UUID
+              - column:
+                  constraints:
+                    foreignKeyName: fk__user_preference__user_id__user__id
+                    referencedColumnNames: id
+                    referencedTableName: users
+                  name: user_id
+                  type: UUID
+              - column:
+                  constraints:
+                    foreignKeyName: fk__user_preference_category__preference_category_id
+                    referencedColumnNames: id
+                    referencedTableName: preferences
+                  name: category
+                  type: VARCHAR(64)
+              - column:
+                  name: created_at
+                  type: TIMESTAMPTZ
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
