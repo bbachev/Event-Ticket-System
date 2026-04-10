@@ -25,7 +25,7 @@ public class NotificationKafkaConsumer {
     public void consume(EventCreatedMessage message) {
         try {
             log.info("Received message in topic: {} message: {}", "event-created", message);
-            this.notificationService.addMessage(message);
+            this.notificationService.handleMessage(message);
         } catch (RuntimeException e){
             log.error(e.getMessage());
         }
@@ -36,7 +36,7 @@ public class NotificationKafkaConsumer {
         try {
             BookingCreatedMessage booking = objectMapper.readValue(message, BookingCreatedMessage.class);
             log.info("Received message in topic: {} message: {}", "booking-created", message);
-            this.notificationService.addMessage(booking);
+            this.notificationService.handleMessage(booking);
         } catch (RuntimeException | JsonProcessingException e){
             log.error(e.getMessage());
         }

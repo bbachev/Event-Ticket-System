@@ -9,7 +9,7 @@ public record EventCreatedMessage(
         UUID messageId,
         UUID eventId,
         Integer totalTickets,
-        String category,
+        EventCategory category,
         Long ticketPrice,
         String name,
         String description,
@@ -17,9 +17,13 @@ public record EventCreatedMessage(
         OffsetDateTime eventDate
 )
         implements NotificationMessage {
-
     @Override
     public UUID userId() {
+        return null;
+    }
+
+    @Override
+    public String receiver() {
         return null;
     }
 
@@ -32,10 +36,13 @@ public record EventCreatedMessage(
     public Map<String, String> toPlaceholders() {
         return  Map.of(
                 "eventName", name,
-                "category", category,
+                "category", category.name(),
                 "location", location,
                 "eventDate", eventDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy 'at' HH:mm")),
                 "price", String.format("%.2f EUR", ticketPrice / 100.0)
         );
     }
+
+
+
 }

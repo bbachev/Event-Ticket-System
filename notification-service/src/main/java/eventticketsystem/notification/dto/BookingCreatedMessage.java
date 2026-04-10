@@ -11,12 +11,18 @@ public record BookingCreatedMessage(
         UUID eventId,
         Integer bookedTickets,
         Long totalPrice,
+        String receiver,
         OffsetDateTime timestamp
         ) implements NotificationMessage{
 
         @Override
         public String templateId() {
                 return TemplateType.BOOKING_CREATED.toString();
+        }
+
+        @Override
+        public EventCategory category() {
+                return null;
         }
 
         @Override

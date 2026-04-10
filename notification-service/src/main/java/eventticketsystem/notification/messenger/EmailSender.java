@@ -30,7 +30,7 @@ public class EmailSender {
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
         helper.setFrom(sender);
-        helper.setTo("bbachev29@gmail.com");
+        helper.setTo(receiver);
         helper.setSubject(template.subject());
 
         String body = template.bodyHtml();

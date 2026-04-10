@@ -42,3 +42,6 @@ spring:
 logging:
   level:
     liquibase: INFO
+rest:
+  preference-service:
+    url: http://localhost:8084/preferences?category=

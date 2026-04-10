@@ -1,7 +1,10 @@
 package eventticketsystem.notification;
 
+import eventticketsystem.notification.adapter.PreferenceClient;
+import eventticketsystem.notification.dto.EventCategory;
 import eventticketsystem.notification.dto.EventCreatedMessage;
 import eventticketsystem.notification.dto.NotificationMessage;
+import eventticketsystem.notification.dto.User;
 import eventticketsystem.notification.entity.MessageEntity;
 import eventticketsystem.notification.entity.MessageTemplateEntity;
 import eventticketsystem.notification.exception.MessageAlreadyExistsException;
@@ -19,6 +22,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,6 +33,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class NotificationServiceImplTests {
+    @Mock
+    PreferenceClient preferenceClient;
 
     @Mock
     EmailSender emailSender;
@@ -51,7 +57,7 @@ public class NotificationServiceImplTests {
                 UUID.randomUUID(),
                 UUID.randomUUID(),
                 200,
-                "SPORTS",
+                EventCategory.SPORTS,
                 1500L,
                 "Test",
                 "Test",
@@ -65,14 +71,14 @@ public class NotificationServiceImplTests {
     }
 
     @Test
-    public void testAddMessageShouldThrowIfTemplateDoesNotExist(){
+    public void testHandleMessageShouldThrowIfTemplateDoesNotExist(){
         when(this.messageTemplateRepository.findById(any(String.class))).thenThrow(TemplateNotExistsException.class);
 
-        assertThrowsExactly(TemplateNotExistsException.class, () -> this.notificationService.addMessage(notificationMessage));
+        assertThrowsExactly(TemplateNotExistsException.class, () -> this.notificationService.handleMessage(notificationMessage));
     }
 
     @Test
-    public void testAddMessageShouldThrowIfMessageAlreadyExists() {
+    public void testHandleMessageShouldThrowIfMessageAlreadyExists() {
 
         when(this.messageTemplateRepository.findById(any(String.class))).thenReturn(Optional.ofNullable(messageTemplate));
 
@@ -83,9 +89,12 @@ public class NotificationServiceImplTests {
         messageEntity.setSubject(messageTemplate.getSubject());
         messageEntity.setCreatedAt(OffsetDateTime.now());
 
-        when(this.messageRepository.existsById(notificationMessage.messageId())).thenThrow(MessageAlreadyExistsException.class);
+        User user = new User(UUID.randomUUID(), "test", "test", "test@test.com");
 
-        assertThrowsExactly(MessageAlreadyExistsException.class, () -> this.notificationService.addMessage(notificationMessage));
+        when(this.preferenceClient.getUsersByPreference(any(EventCategory.class))).thenReturn(List.of(user));
+        when(this.messageRepository.existsById(any(UUID.class))).thenThrow(MessageAlreadyExistsException.class);
+
+        assertThrowsExactly(MessageAlreadyExistsException.class, () -> this.notificationService.handleMessage(notificationMessage));
     }
 
     @Test
@@ -96,7 +105,11 @@ public class NotificationServiceImplTests {
         when(this.messageRepository.save(any(MessageEntity.class))).thenReturn(new MessageEntity());
         when(this.emailSender.getSender()).thenReturn("test@test.com");
 
-        NotificationMessage result = this.notificationService.addMessage(notificationMessage);
+        User user = new User(UUID.randomUUID(), "test", "test", "test@test.com");
+
+        when(this.preferenceClient.getUsersByPreference(any(EventCategory.class))).thenReturn(List.of(user));
+
+        NotificationMessage result = this.notificationService.handleMessage(notificationMessage);
         assertNotNull(result);
         Mockito.verify(this.messageRepository).save(any(MessageEntity.class));
 
