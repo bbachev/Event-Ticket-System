@@ -58,6 +58,7 @@ public class NotificationServiceImplTests {
                 UUID.randomUUID(),
                 200,
                 EventCategory.SPORTS,
+                "test@test.com",
                 1500L,
                 "Test",
                 "Test",

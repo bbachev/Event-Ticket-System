@@ -10,6 +10,7 @@ public record EventCreatedMessage(
         UUID eventId,
         Integer totalTickets,
         EventCategory category,
+        String receiver,
         Long ticketPrice,
         String name,
         String description,

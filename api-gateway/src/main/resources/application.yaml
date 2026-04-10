@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: api-gateway
+  profiles:
+    active: local
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+logging:
+  level:
+    liquibase: INFO
+
+rest:
+  preference-service:
+    url: http://localhost:8084/preferences/
+  event-service:
+    url: http://localhost:8081/events/
+  booking-service:
+    url: http://localhost:8082/bookings
+
+jwt:
+  secret: "/zu+p52gszkEI7k1YZuwdGZ7gKHPr6+ern1eHGG27FI="
+  expiration: 86400000

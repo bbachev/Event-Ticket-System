@@ -46,7 +46,7 @@ public class PreferenceController {
     }
 
     @PostMapping("/preferences/user-details/{userId}")
-    public ResponseEntity<?> addUserPreferences(@PathVariable UUID userId, @RequestBody UserDetailsRequest request) {
+    public ResponseEntity<?> addUserDetails(@PathVariable UUID userId, @RequestBody UserDetailsRequest request) {
         try {
             this.preferenceService.addUserDetails(userId, request);
             return ResponseEntity.status(HttpStatus.CREATED).build();

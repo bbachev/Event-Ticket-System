@@ -42,10 +42,10 @@ public class NotificationServiceImpl implements NotificationService {
                 .orElseThrow(() -> new TemplateNotExistsException(message.templateId()));
 
         List<User> receivers;
-        if (message.receiver() != null) {
-            receivers = List.of(new User(message.userId(), null, null, message.receiver()));
-        } else {
+        if (message.templateId().equals(TemplateType.NEW_EVENT.toString())) {
             receivers = this.preferenceClient.getUsersByPreference(message.category());
+        } else {
+            receivers = List.of(new User(message.userId(), null, null, message.receiver()));
         }
 
         receivers.forEach(user -> {

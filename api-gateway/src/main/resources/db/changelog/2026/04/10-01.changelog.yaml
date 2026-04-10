@@ -1,0 +1,71 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20260410-095400
+      author: bachev
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk__users__id
+                  name: id
+                  type: UUID
+              - column:
+                  name: password
+                  type: VARCHAR(64)
+              - column:
+                  name: first_name
+                  type: VARCHAR(64)
+              - column:
+                  name: last_name
+                  type: VARCHAR(64)
+              - column:
+                  constraints:
+                    unique: true
+                  name: email
+                  type: VARCHAR(64)
+              - column:
+                  name: created_at
+                  type: TIMESTAMPTZ
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+  - changeSet:
+      id: 20260410-114400
+      author: bachev
+      changes:
+        - createTable:
+            tableName: user_role
+            columns:
+              - column:
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk__users_role__id
+                  name: id
+                  type: VARCHAR(32)
+        - insert:
+            tableName: user_role
+            columns:
+              - column:
+                  name: id
+                  value: ADMIN
+        - insert:
+            tableName: user_role
+            columns:
+              - column:
+                  name: id
+                  value: USER
+  - changeSet:
+      id: 20260410-115100
+      author: bachev
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  constraints:
+                    foreignKeyName: fk__users_role__user_role_id
+                    referencedColumnNames: id
+                    referencedTableName: user_role
+                  name: role
+                  type: varchar(32)
