@@ -18,15 +18,14 @@ public class PreferenceController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<Void> addPreferences(@PathVariable UUID id, @RequestBody PreferenceRequest request,
-                                               @RequestHeader("Authorization") String authHeader) {
-       this.preferenceAdapter.addUserPreferences(id, request, authHeader);
+    public ResponseEntity<Void> addPreferences(@PathVariable UUID id, @RequestBody PreferenceRequest request) {
+       this.preferenceAdapter.addUserPreferences(id, request);
        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getPreferences(@PathVariable UUID id, @RequestHeader("Authorization") String authHeader){
-        return ResponseEntity.ok(this.preferenceAdapter.getUserPreference(id, authHeader));
+    public ResponseEntity<?> getPreferences(@PathVariable UUID id){
+        return ResponseEntity.ok(this.preferenceAdapter.getUserPreference(id));
     }
 }
 

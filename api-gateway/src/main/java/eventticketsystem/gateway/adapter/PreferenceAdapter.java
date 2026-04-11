@@ -12,6 +12,6 @@ import java.util.UUID;
 public interface PreferenceAdapter {
 
     void addUserDetails(UserEntity userEntity);
-    void addUserPreferences(UUID userId, PreferenceRequest request, String authHeader);
-    Optional<UserPreference> getUserPreference(UUID userId, String authHeader);
+    void addUserPreferences(UUID userId, PreferenceRequest request);
+    Optional<UserPreference> getUserPreference(UUID userId);
 }

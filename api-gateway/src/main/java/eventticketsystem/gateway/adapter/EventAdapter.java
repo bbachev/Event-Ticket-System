@@ -10,10 +10,10 @@ import java.util.UUID;
 
 public interface EventAdapter {
 
-    EventResponse createEvent(EventRequest request, String auth);
-    EventResponse updateEvent(UUID eventId, EventRequest request, String auth);
-    void deleteEvent(UUID eventId, String auth);
-    Optional<EventResponse> getEvent(UUID eventId, String auth);
-    PageDto<EventResponse> getAllEvents(EventFilterRequest filter, String auth);
+    EventResponse createEvent(EventRequest request);
+    EventResponse updateEvent(UUID eventId, EventRequest request);
+    void deleteEvent(UUID eventId);
+    Optional<EventResponse> getEvent(UUID eventId);
+    PageDto<EventResponse> getAllEvents(EventFilterRequest filter);
 
 }

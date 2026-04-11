@@ -150,3 +150,8 @@ Preference Service
 Notification Service
 •	GET /notifications/{userId}
 
+
+-----------------------------------------------------------------------------------------------
+
+
+![Architecture Diagram](./docs/architecture.png)

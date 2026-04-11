@@ -48,22 +48,19 @@ public class PreferenceAdapterImpl implements eventticketsystem.gateway.adapter.
     }
 
     @Override
-    public void addUserPreferences(UUID userId, PreferenceRequest request, String authHeader) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(authHeader.substring(7));
+    public void addUserPreferences(UUID userId, PreferenceRequest request) {
         restTemplate.exchange(
                 url + userId,
                 HttpMethod.POST,
-                new HttpEntity<>(request, headers),
+                new HttpEntity<>(request),
                 new ParameterizedTypeReference<>() {
                 }
         );
     }
 
     @Override
-    public Optional<UserPreference> getUserPreference(UUID userId, String authHeader) {
+    public Optional<UserPreference> getUserPreference(UUID userId) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(authHeader.substring(7));
 
         return Optional.ofNullable(
                 restTemplate.exchange(

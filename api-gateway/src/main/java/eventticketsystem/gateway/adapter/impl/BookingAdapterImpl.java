@@ -50,9 +50,9 @@ public class BookingAdapterImpl implements BookingAdapter {
     }
 
     @Override
-    public PageDto<Booking> getAllBookingsForUser(UUID userId, int page, int size, String authHeader) {
+    public PageDto<Booking> getAllBookingsForUser(UUID userId, int page, int size) {
         ResponseEntity<PageDto<Booking>> response = restTemplate.exchange(
-                url + userId + "?page=" + page + "&size=" + size,
+                url + "?userId=" + userId + "&page=" + page + "&size=" + size,
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<>() {
@@ -63,9 +63,9 @@ public class BookingAdapterImpl implements BookingAdapter {
     }
 
     @Override
-    public void deleteBooking(UUID id, String authHeader) {
+    public void deleteBooking(UUID id) {
         ResponseEntity<Void> response = restTemplate.exchange(
-                url + id,
+                url + "/" + id,
                 HttpMethod.DELETE,
                 null,
                 new ParameterizedTypeReference<>() {

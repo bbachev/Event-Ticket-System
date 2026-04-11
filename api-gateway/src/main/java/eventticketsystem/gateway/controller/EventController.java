@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-@RequestMapping("events")
+@RequestMapping("/events")
 @RestController
 public class EventController {
     private final EventAdapter eventAdapter;
@@ -18,30 +18,28 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createEvent(@RequestBody EventRequest request,
-                       @RequestHeader("Authorization") String authHeader) {
-        return ResponseEntity.ok(this.eventAdapter.createEvent(request, authHeader));
+    public ResponseEntity<?> createEvent(@RequestBody EventRequest request) {
+        return ResponseEntity.ok(this.eventAdapter.createEvent(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateEvent(@PathVariable UUID id, @RequestBody EventRequest request,
-                                         @RequestHeader("Authorization") String authHeader) {
-        return ResponseEntity.ok(this.eventAdapter.updateEvent(id, request, authHeader));
+    public ResponseEntity<?> updateEvent(@PathVariable UUID id, @RequestBody EventRequest request) {
+        return ResponseEntity.ok(this.eventAdapter.updateEvent(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEvent(@PathVariable UUID id, @RequestHeader("Authorization") String authHeader) {
-        this.eventAdapter.deleteEvent(id, authHeader);
+    public ResponseEntity<Void> deleteEvent(@PathVariable UUID id) {
+        this.eventAdapter.deleteEvent(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id})")
-    public ResponseEntity<?> getEvent(@PathVariable UUID id, @RequestHeader("Authorization") String authHeader){
-        return ResponseEntity.ok(this.eventAdapter.getEvent(id, authHeader));
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getEvent(@PathVariable UUID id){
+        return ResponseEntity.ok(this.eventAdapter.getEvent(id));
     }
 
     @GetMapping()
-    public ResponseEntity<?> getEvents(@RequestBody EventFilterRequest request, @RequestHeader("Authorization") String authHeader){
-        return ResponseEntity.ok(this.eventAdapter.getAllEvents(request, authHeader));
+    public ResponseEntity<?> getEvents(@ModelAttribute EventFilterRequest request){
+        return ResponseEntity.ok(this.eventAdapter.getAllEvents(request));
     }
 }

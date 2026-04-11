@@ -44,6 +44,7 @@ public class GatewayServiceImpl implements GatewayService {
         return MAPPER.toDto(entity);
     }
 
+
     @Override
     public LoginResponse loginUser(LoginRequest request) {
         UserEntity userEntity = this.userRepository.findByEmail(request.email())

@@ -9,11 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -32,7 +32,7 @@ public class EventAdapterImpl implements EventAdapter {
 
 
     @Override
-    public EventResponse createEvent(EventRequest request, String authHeader) {
+    public EventResponse createEvent(EventRequest request) {
         ResponseEntity<EventResponse> response = restTemplate.exchange(
                 url,
                 HttpMethod.POST,
@@ -45,9 +45,9 @@ public class EventAdapterImpl implements EventAdapter {
     }
 
     @Override
-    public EventResponse updateEvent(UUID eventId, EventRequest request, String authHeader) {
+    public EventResponse updateEvent(UUID eventId, EventRequest request) {
         ResponseEntity<EventResponse> response = restTemplate.exchange(
-                url + eventId,
+                url + "/" + eventId,
                 HttpMethod.PUT,
                 new HttpEntity<>(request),
                 new ParameterizedTypeReference<>() {
@@ -57,9 +57,9 @@ public class EventAdapterImpl implements EventAdapter {
     }
 
     @Override
-    public void deleteEvent(UUID eventId, String authHeader) {
+    public void deleteEvent(UUID eventId) {
         restTemplate.exchange(
-                url + eventId,
+                url + "/" + eventId,
                 HttpMethod.DELETE,
                 null,
                 new ParameterizedTypeReference<>() {
@@ -68,10 +68,10 @@ public class EventAdapterImpl implements EventAdapter {
     }
 
     @Override
-    public Optional<EventResponse> getEvent(UUID eventId, String authHeader) {
+    public Optional<EventResponse> getEvent(UUID eventId) {
         return Optional.ofNullable(
                 restTemplate.exchange(
-                        url + eventId,
+                        url + "/" + eventId,
                         HttpMethod.GET,
                         null,
                         new ParameterizedTypeReference<EventResponse>() {
@@ -81,10 +81,14 @@ public class EventAdapterImpl implements EventAdapter {
     }
 
     @Override
-    public PageDto<EventResponse> getAllEvents(EventFilterRequest filter, String authHeader) {
+    public PageDto<EventResponse> getAllEvents(EventFilterRequest filter) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
+        filter.toParams().entrySet().stream()
+                .filter(e -> e.getValue() != null)
+                .forEach(e -> builder.queryParam(e.getKey(), e.getValue()));
 
         ResponseEntity<PageDto<EventResponse>> response = restTemplate.exchange(
-                url,
+                builder.toUriString(),
                 HttpMethod.GET,
                 new HttpEntity<>(filter),
                 new ParameterizedTypeReference<>() {

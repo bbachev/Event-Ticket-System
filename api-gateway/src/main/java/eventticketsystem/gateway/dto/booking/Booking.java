@@ -8,6 +8,7 @@ public record Booking (
         UUID userId,
         UUID eventId,
         Integer bookedTickets,
+        BookingStatus status,
         Long totalPrice,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt

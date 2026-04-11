@@ -21,7 +21,7 @@ rest:
   preference-service:
     url: http://localhost:8084/preferences/
   event-service:
-    url: http://localhost:8081/events/
+    url: http://localhost:8081/events
   booking-service:
     url: http://localhost:8082/bookings
 
