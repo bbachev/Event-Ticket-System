@@ -2,7 +2,6 @@ package eventticketsystem.gateway.adapter;
 
 
 import eventticketsystem.gateway.dto.preference.PreferenceRequest;
-import eventticketsystem.gateway.dto.preference.UserDetailsRequest;
 import eventticketsystem.gateway.dto.preference.UserPreference;
 import eventticketsystem.gateway.entity.UserEntity;
 

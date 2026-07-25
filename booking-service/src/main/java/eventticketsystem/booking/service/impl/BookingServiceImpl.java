@@ -11,6 +11,7 @@ import eventticketsystem.booking.mapper.BookingMapper;
 import eventticketsystem.booking.repository.BookingRepository;
 import eventticketsystem.booking.repository.TicketInventoryRepository;
 import eventticketsystem.booking.service.BookingService;
+import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -19,10 +20,12 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class BookingServiceImpl implements BookingService {
     private static final BookingMapper MAPPER = Mappers.getMapper(BookingMapper.class);
 
@@ -35,45 +38,52 @@ public class BookingServiceImpl implements BookingService {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final BookingRepository bookingRepository;
     private final TicketInventoryRepository ticketInventoryRepository;
+    private final RedisDistributedLockService redisDistributedLockService;
 
-    public BookingServiceImpl(KafkaTemplate<String, Object> kafkaTemplate, BookingRepository bookingRepository, TicketInventoryRepository ticketInventoryRepository) {
+    public BookingServiceImpl(KafkaTemplate<String, Object> kafkaTemplate,
+                              BookingRepository bookingRepository, TicketInventoryRepository ticketInventoryRepository,
+                              RedisDistributedLockService redisDistributedLockService) {
         this.kafkaTemplate = kafkaTemplate;
         this.bookingRepository = bookingRepository;
         this.ticketInventoryRepository = ticketInventoryRepository;
+        this.redisDistributedLockService = redisDistributedLockService;
     }
 
     @Transactional
     @Override
     public Booking createBooking(BookingRequest request, UUID userId,  String email) {
-        TicketInventoryEntity ticketInventoryEntity =
-                this.ticketInventoryRepository.findById(request.eventId())
-                        .orElseThrow(() -> new TicketInventoryNotFoundException(String.valueOf(request.eventId())));
+            boolean isLocked = this.redisDistributedLockService.acquireLock("lock:ticket-inventory:" + request.eventId(), Duration.ofSeconds(15));
+        if (!isLocked) throw new TicketsNotAvailableException();
 
-        int availableTickets = ticketInventoryEntity.getAvailableTickets();
-        if (availableTickets < request.numberOfTickets()) throw new TicketsNotAvailableException();
+            TicketInventoryEntity ticketInventoryEntity =
+                    this.ticketInventoryRepository.findById(request.eventId())
+                            .orElseThrow(() -> new TicketInventoryNotFoundException(String.valueOf(request.eventId())));
+
+            int availableTickets = ticketInventoryEntity.getAvailableTickets();
+            if (availableTickets < request.numberOfTickets()) throw new TicketsNotAvailableException();
 
 
-        ticketInventoryEntity.setAvailableTickets(availableTickets - request.numberOfTickets());
-        this.ticketInventoryRepository.save(ticketInventoryEntity);
+            ticketInventoryEntity.setAvailableTickets(availableTickets - request.numberOfTickets());
+            this.ticketInventoryRepository.save(ticketInventoryEntity);
 
-        BookingEntity bookingEntity = new BookingEntity();
-        bookingEntity.setUserId(userId);
-        bookingEntity.setBookedTickets(request.numberOfTickets());
-        bookingEntity.setStatus(BookingStatus.CONFIRMED);
-        bookingEntity.setEventId(request.eventId());
-        bookingEntity.setTotalPrice(request.numberOfTickets() * ticketInventoryEntity.getTicketPrice());
-        bookingEntity.setCreatedAt(OffsetDateTime.now());
+            BookingEntity bookingEntity = new BookingEntity();
+            bookingEntity.setUserId(userId);
+            bookingEntity.setBookedTickets(request.numberOfTickets());
+            bookingEntity.setStatus(BookingStatus.CONFIRMED);
+            bookingEntity.setEventId(request.eventId());
+            bookingEntity.setTotalPrice(request.numberOfTickets() * ticketInventoryEntity.getTicketPrice());
+            bookingEntity.setCreatedAt(OffsetDateTime.now());
 
-        Booking model = MAPPER.toModel(this.bookingRepository.save(bookingEntity), email);
-        if (ticketInventoryEntity.getAvailableTickets() == 0) {
-            this.kafkaTemplate.send(eventUpdateTopic, new EventUpdateMessage(
-                    ticketInventoryEntity.getEventId(),
-                    EventStatus.SOLD_OUT)
-            );
-        }
+            Booking model = MAPPER.toModel(this.bookingRepository.save(bookingEntity), email);
+            if (ticketInventoryEntity.getAvailableTickets() == 0) {
+                this.kafkaTemplate.send(eventUpdateTopic, new EventUpdateMessage(
+                        ticketInventoryEntity.getEventId(),
+                        EventStatus.SOLD_OUT)
+                );
+            }
 
-        this.kafkaTemplate.send(bookingCreatedTopic, MAPPER.toMessage(model));
-        return model;
+            this.kafkaTemplate.send(bookingCreatedTopic, MAPPER.toMessage(model));
+            return model;
     }
 
     @Override

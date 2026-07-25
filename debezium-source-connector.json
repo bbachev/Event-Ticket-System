@@ -1,0 +1,17 @@
+{
+  "name": "event-db-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "database.hostname": "event-db",
+    "database.port": "5432",
+    "database.user": "postgres",
+    "database.password": "postgres",
+    "database.dbname": "event_db",
+    "database.server.name": "event-db",
+    "topic.prefix": "cdc",
+    "table.include.list": "public.event",
+    "plugin.name": "pgoutput",
+    "key.converter.schemas.enable": "false",
+    "value.converter.schemas.enable": "false"
+  }
+}
