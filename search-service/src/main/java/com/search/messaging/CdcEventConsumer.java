@@ -40,7 +40,7 @@ public class CdcEventConsumer {
                 return;
             }
             String id = (String) before.get("id");
-            eventSearchRepository.deleteById(id);
+            eventSearchRepository.findById(id).ifPresent(this.eventSearchRepository::delete);
             return;
         }
 
